@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/responsive/mobile_screen.dart';
+import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
+import 'package:instagram_clone/responsive/web_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,9 +17,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Scaffold(
-        appBar: AppBar(title: Text('Instagram')),
-        body: Center(child: Text('Start')),
+      home: ResponsiveLayout(
+        mobileScreenLayout: MobileScreen(),
+        webScreenLayout: WebScreen(),
       ),
     );
   }
