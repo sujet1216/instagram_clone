@@ -66,7 +66,7 @@ class _LoginState extends State<Login> {
                     bottom: -10,
                     right: -10,
                     child: IconButton(
-                      onPressed: () => pickImage(ImageSource.camera),
+                      onPressed: () => pickImage(ImageSource.gallery),
                       icon: Icon(Icons.add_a_photo, color: Colors.blue),
                     ),
                   ),
@@ -74,13 +74,19 @@ class _LoginState extends State<Login> {
               ),
             SizedBox(height: 16),
             TextField(
-              decoration: InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                labelText: 'Email',
+                border: OutlineInputBorder(),
+              ),
               keyboardType: TextInputType.emailAddress,
               controller: _emailController,
             ),
             SizedBox(height: 16),
             TextField(
-              decoration: InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
+              decoration: InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
               obscureText: true,
               controller: _passController,
             ),
@@ -97,7 +103,10 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 16),
                   TextField(
-                    decoration: InputDecoration(labelText: 'Bio', border: OutlineInputBorder()),
+                    decoration: InputDecoration(
+                      labelText: 'Bio',
+                      border: OutlineInputBorder(),
+                    ),
                     controller: _bioController,
                   ),
                 ],
