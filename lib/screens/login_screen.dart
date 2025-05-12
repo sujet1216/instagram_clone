@@ -120,7 +120,7 @@ class _LoginState extends State<Login> {
                     password: _passController.text,
                     bio: _bioController.text,
                     username: _usernameController.text,
-                    file: Uint8List(2),
+                    file: pickedImage,
                   );
                 }
               },

@@ -22,10 +22,8 @@ class AuthMethods {
           bio.isNotEmpty &&
           file != null) {
         //! AUTH
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        UserCredential userCredential = await _auth
+            .createUserWithEmailAndPassword(email: email, password: password);
 
         //! FIRESTORE
         await _firestore.collection('users').doc(userCredential.user?.uid).set({
