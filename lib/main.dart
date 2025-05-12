@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
@@ -23,6 +25,13 @@ void main() async {
   } else {
     await Firebase.initializeApp();
   }
+  // Timer(Duration(seconds: 5), () => print('finished'));
+  // Timer.periodic(Duration(seconds: 2), (timer) {
+  //   print(timer.tick);
+  //   if (timer.tick == 5) {
+  //     timer.cancel();
+  //   }
+  // });
 
   runApp(const MyApp());
 }
