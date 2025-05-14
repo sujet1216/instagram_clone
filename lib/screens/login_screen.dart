@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:instagram_clone/logger.dart';
 import 'package:instagram_clone/resources/auth_methods.dart';
 
 class Login extends StatefulWidget {
@@ -43,6 +45,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    // logger.w('user: ${FirebaseAuth.instance.currentUser}');
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Padding(
@@ -66,7 +69,7 @@ class _LoginState extends State<Login> {
                     bottom: -10,
                     right: -10,
                     child: IconButton(
-                      onPressed: () => pickImage(ImageSource.gallery),
+                      onPressed: () => pickImage(ImageSource.camera),
                       icon: Icon(Icons.add_a_photo, color: Colors.blue),
                     ),
                   ),
@@ -74,19 +77,13 @@ class _LoginState extends State<Login> {
               ),
             SizedBox(height: 16),
             TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
               keyboardType: TextInputType.emailAddress,
               controller: _emailController,
             ),
             SizedBox(height: 16),
             TextField(
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
               obscureText: true,
               controller: _passController,
             ),
@@ -103,10 +100,7 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 16),
                   TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Bio',
-                      border: OutlineInputBorder(),
-                    ),
+                    decoration: InputDecoration(labelText: 'Bio', border: OutlineInputBorder()),
                     controller: _bioController,
                   ),
                 ],
