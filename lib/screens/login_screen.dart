@@ -18,8 +18,10 @@ class _LoginState extends State<Login> {
   final TextEditingController _passController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+
   Uint8List? pickedImage;
 
+  bool isLoading = false;
   bool isLogin = true;
 
   void pickImage(ImageSource source) async {
@@ -31,6 +33,28 @@ class _LoginState extends State<Login> {
       setState(() {
         pickedImage = img;
       });
+    }
+  }
+
+  void authenticateUser() async {
+    if (!isLogin) {
+      setState(() => isLoading = true);
+      var res = await AuthMethods().signUpUser(
+        email: _emailController.text,
+        password: _passController.text,
+        bio: _bioController.text,
+        username: _usernameController.text,
+        file: pickedImage,
+      );
+      setState(() => isLoading = false);
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
+    } else {
+      //! .signInUser()
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('waiting implementation....')));
+      }
     }
   }
 
@@ -106,20 +130,7 @@ class _LoginState extends State<Login> {
                 ],
               ),
             SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                if (!isLogin) {
-                  AuthMethods().signUpUser(
-                    email: _emailController.text,
-                    password: _passController.text,
-                    bio: _bioController.text,
-                    username: _usernameController.text,
-                    file: pickedImage,
-                  );
-                }
-              },
-              child: Text('Login'),
-            ),
+            ElevatedButton(onPressed: isLoading ? null : authenticateUser, child: Text('Login')),
             ElevatedButton(
               onPressed: () {
                 setState(() {
