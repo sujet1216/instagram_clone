@@ -9,6 +9,8 @@ import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
 import 'package:instagram_clone/responsive/web_screen.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
 
+//! git log HEAD..origin/master - sheamocme rame tu aris ganaxlebuli
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (kIsWeb) {
@@ -44,7 +46,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
       // home: ResponsiveLayout(mobileScreenLayout: MobileScreen(), webScreenLayout: WebScreen()),
       home: Login(),
     );
