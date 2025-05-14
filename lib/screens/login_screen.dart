@@ -38,6 +38,7 @@ class _LoginState extends State<Login> {
 
   void authenticateUser() async {
     if (!isLogin) {
+      //! .signUpUser()
       setState(() => isLoading = true);
       var res = await AuthMethods().signUpUser(
         email: _emailController.text,
@@ -47,13 +48,25 @@ class _LoginState extends State<Login> {
         file: pickedImage,
       );
       setState(() => isLoading = false);
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
+      }
+      ;
     } else {
       //! .signInUser()
+      setState(() => isLoading = true);
+
+      String res = await AuthMethods().signInUser(
+        email: _emailController.text,
+        password: _passController.text,
+      );
+      setState(() => isLoading = false);
+
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('waiting implementation....')));
+        ScaffoldMessenger.of(context).clearSnackBars();
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
       }
     }
   }
@@ -69,7 +82,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    // logger.w('user: ${FirebaseAuth.instance.currentUser}');
+    logger.w('user: ${FirebaseAuth.instance.currentUser}');
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Padding(
@@ -77,6 +90,23 @@ class _LoginState extends State<Login> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            StreamBuilder(
+              stream: FirebaseAuth.instance.authStateChanges(),
+              builder: (ctx, snap) {
+                if (snap.data != null) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        FirebaseAuth.instance.signOut();
+                      });
+                    },
+                    child: Text('Log out'),
+                  );
+                } else {
+                  return Icon(Icons.hourglass_empty);
+                }
+              },
+            ),
             if (!isLogin)
               Stack(
                 children: [

@@ -57,10 +57,39 @@ class AuthMethods {
 
         message = 'Success';
       }
+    } on FirebaseAuthException catch (err) {
+      logger.e(err);
+      logger.e(err.code);
+      if (err.code == 'wrong-password') {
+        //! ..................
+      }
     } catch (error) {
       message = error.toString();
     }
     logger.w(message);
+    return message;
+  }
+
+  Future<String> signInUser({required String email, required String password}) async {
+    String message = 'Absolutly NOthing';
+    if (email.isNotEmpty && password.isNotEmpty) {
+      try {
+        UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
+      } on FirebaseAuthException catch (err) {
+        if (err.code == 'wrong-password') {
+          //! ..................
+        }
+      } catch (error) {
+        String err = error.toString();
+        int index = err.indexOf(']');
+        logger.e(err.substring(index + 2));
+        message = err.substring(index + 2);
+        // rethrow; // mashin saidanac idzaxeb iq try catch gchirdeba.
+      }
+    }
     return message;
   }
 }
