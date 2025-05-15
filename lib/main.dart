@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
+import 'package:instagram_clone/logger.dart';
 import 'package:instagram_clone/responsive/mobile_screen.dart';
 import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
 import 'package:instagram_clone/responsive/web_screen.dart';
@@ -38,8 +40,16 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final Stream<User?> authStateChanges =
+      FirebaseAuth.instance.authStateChanges();
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +59,26 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      // home: ResponsiveLayout(mobileScreenLayout: MobileScreen(), webScreenLayout: WebScreen()),
-      home: Login(),
+      home: StreamBuilder(
+        stream: authStateChanges,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.active) {
+            if (snapshot.hasData) {
+              logger.w('user: ${FirebaseAuth.instance.currentUser}');
+
+              return ResponsiveLayout(
+                mobileScreenLayout: MobileScreen(),
+                webScreenLayout: WebScreen(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text(snapshot.error.toString()));
+            }
+          } else if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          return Login();
+        },
+      ),
     );
   }
 }

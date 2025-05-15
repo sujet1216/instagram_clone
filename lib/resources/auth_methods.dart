@@ -25,10 +25,8 @@ class AuthMethods {
           bio.isNotEmpty &&
           file != null) {
         //! AUTH
-        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+        UserCredential userCredential = await _auth
+            .createUserWithEmailAndPassword(email: email, password: password);
 
         //! STORAGE
 
@@ -70,7 +68,10 @@ class AuthMethods {
     return message;
   }
 
-  Future<String> signInUser({required String email, required String password}) async {
+  Future<String> signInUser({
+    required String email,
+    required String password,
+  }) async {
     String message = 'Absolutly NOthing';
     if (email.isNotEmpty && password.isNotEmpty) {
       try {
