@@ -3,14 +3,22 @@ import 'dart:typed_data';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
 import 'package:instagram_clone/logger.dart';
+import 'package:instagram_clone/models/user_model.dart';
 
 class AuthMethods {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  Future<UserModel> getUser() async {
+    DocumentSnapshot snap = await _firestore.collection('users').doc(_auth.currentUser!.uid).get();
+    return UserModel.fromSnap(snap);
+  }
+
   Future<String> signUpUser({
+    required BuildContext context,
     required String email,
     required String password,
     required String username,
@@ -25,8 +33,11 @@ class AuthMethods {
           bio.isNotEmpty &&
           file != null) {
         //! AUTH
-        UserCredential userCredential = await _auth
-            .createUserWithEmailAndPassword(email: email, password: password);
+
+        UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        );
 
         //! STORAGE
 
@@ -43,15 +54,17 @@ class AuthMethods {
         await userCredential.user!.updatePhotoURL(downloadUrl);
 
         //! FIRESTORE DATABASE
-        await _firestore.collection('users').doc(userCredential.user?.uid).set({
-          "uid": userCredential.user?.uid,
-          "email": email,
-          "username": username,
-          "bio": bio,
-          "photoUrl": downloadUrl,
-          "followers": [],
-          "following": [],
-        });
+        UserModel user = UserModel(
+          bio: bio,
+          email: email,
+          followers: [],
+          following: [],
+          photoUrl: downloadUrl,
+          uid: userCredential.user!.uid,
+          username: username,
+        );
+
+        await _firestore.collection('users').doc(userCredential.user?.uid).set(user.toJson());
 
         message = 'Success';
       }
@@ -68,10 +81,7 @@ class AuthMethods {
     return message;
   }
 
-  Future<String> signInUser({
-    required String email,
-    required String password,
-  }) async {
+  Future<String> signInUser({required String email, required String password}) async {
     String message = 'Absolutly NOthing';
     if (email.isNotEmpty && password.isNotEmpty) {
       try {
@@ -83,6 +93,8 @@ class AuthMethods {
         if (err.code == 'wrong-password') {
           //! ..................
         }
+        message = err.toString();
+        logger.e(err);
       } catch (error) {
         String err = error.toString();
         int index = err.indexOf(']');

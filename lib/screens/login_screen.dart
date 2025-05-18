@@ -1,10 +1,13 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instagram_clone/logger.dart';
 import 'package:instagram_clone/resources/auth_methods.dart';
+import 'package:instagram_clone/utils/utils.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -24,23 +27,20 @@ class _LoginState extends State<Login> {
   bool isLoading = false;
   bool isLogin = true;
 
-  void pickImage(ImageSource source) async {
-    final ImagePicker imagePicker = ImagePicker();
-    XFile? xFile = await imagePicker.pickImage(source: source);
-
-    if (xFile != null) {
-      Uint8List img = await xFile.readAsBytes();
-      setState(() {
-        pickedImage = img;
-      });
-    }
+  selectImage() async {
+    Uint8List? im = await pickImage();
+    setState(() {
+      pickedImage = im;
+    });
   }
 
   void authenticateUser() async {
+    logger.w(isLogin);
     if (!isLogin) {
       //! .signUpUser()
       setState(() => isLoading = true);
       var res = await AuthMethods().signUpUser(
+        context: context,
         email: _emailController.text,
         password: _passController.text,
         bio: _bioController.text,
@@ -51,9 +51,7 @@ class _LoginState extends State<Login> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(res)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
       }
     } else {
       //! .signInUser()
@@ -68,9 +66,7 @@ class _LoginState extends State<Login> {
       if (mounted) {
         ScaffoldMessenger.of(context).clearSnackBars();
 
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(res)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
       }
     }
   }
@@ -109,7 +105,7 @@ class _LoginState extends State<Login> {
                     bottom: -10,
                     right: -10,
                     child: IconButton(
-                      onPressed: () => pickImage(ImageSource.gallery),
+                      onPressed: selectImage,
                       icon: Icon(Icons.add_a_photo, color: Colors.blue),
                     ),
                   ),
@@ -117,19 +113,13 @@ class _LoginState extends State<Login> {
               ),
             SizedBox(height: 16),
             TextField(
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
               keyboardType: TextInputType.emailAddress,
               controller: _emailController,
             ),
             SizedBox(height: 16),
             TextField(
-              decoration: InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
-              ),
+              decoration: InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
               obscureText: true,
               controller: _passController,
             ),
@@ -146,19 +136,13 @@ class _LoginState extends State<Login> {
                   ),
                   SizedBox(height: 16),
                   TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Bio',
-                      border: OutlineInputBorder(),
-                    ),
+                    decoration: InputDecoration(labelText: 'Bio', border: OutlineInputBorder()),
                     controller: _bioController,
                   ),
                 ],
               ),
             SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: isLoading ? null : authenticateUser,
-              child: Text('Login'),
-            ),
+            ElevatedButton(onPressed: isLoading ? null : authenticateUser, child: Text('Login')),
             ElevatedButton(
               onPressed: () {
                 setState(() {

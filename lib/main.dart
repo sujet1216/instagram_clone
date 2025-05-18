@@ -6,11 +6,14 @@ import 'package:flutter/foundation.dart';
 
 import 'package:flutter/material.dart';
 import 'package:instagram_clone/logger.dart';
+import 'package:instagram_clone/providers/user_provider.dart';
 import 'package:instagram_clone/responsive/mobile_screen.dart';
 import 'package:instagram_clone/responsive/responsive_layout_screen.dart';
 import 'package:instagram_clone/responsive/web_screen.dart';
 import 'package:instagram_clone/screens/login_screen.dart';
+import 'package:provider/provider.dart';
 
+//! git fetch
 //! git log HEAD..origin/master - sheamocme rame tu aris ganaxlebuli
 
 void main() async {
@@ -48,36 +51,39 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final Stream<User?> authStateChanges =
-      FirebaseAuth.instance.authStateChanges();
+  final Stream<User?> authStateChanges = FirebaseAuth.instance.authStateChanges();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-      ),
-      home: StreamBuilder(
-        stream: authStateChanges,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            if (snapshot.hasData) {
-              logger.w('user: ${FirebaseAuth.instance.currentUser}');
+    // FirebaseAuth.instance.signOut();
+    return ChangeNotifierProvider(
+      create: (_) => UserProvider(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+        home: StreamBuilder(
+          stream: authStateChanges,
+          builder: (context, snapshot) {
+            logger.i('snapshot.connectionState: ${snapshot.connectionState}');
+            logger.i('snapshot.hasData: ${snapshot.hasData}');
+            logger.i('snapshot.hasError: ${snapshot.hasError}');
 
-              return ResponsiveLayout(
-                mobileScreenLayout: MobileScreen(),
-                webScreenLayout: WebScreen(),
-              );
-            } else if (snapshot.hasError) {
-              return Center(child: Text(snapshot.error.toString()));
+            if (snapshot.connectionState == ConnectionState.active) {
+              if (snapshot.hasData) {
+                return ResponsiveLayout(
+                  mobileScreenLayout: MobileScreen(),
+                  webScreenLayout: WebScreen(),
+                );
+              } else if (snapshot.hasError) {
+                return Center(child: Text(snapshot.error.toString()));
+              }
+            } else if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
             }
-          } else if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          return Login();
-        },
+            return Login();
+          },
+        ),
       ),
     );
   }
